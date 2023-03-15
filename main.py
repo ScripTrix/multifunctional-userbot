@@ -1,39 +1,51 @@
-from pyrogram import Client, filters
-from pyrogram import enums
-from pyrogram.errors import FloodWait
-from pyrogram.types import ChatPermissions
-from datetime import datetime, timedelta
 import os
+import random
+import keep_alive
 from time import time
 from time import sleep
-import random
-from replacement_map import REPLACEMENT_MAP
+from pyrogram import enums
 from random import shuffle
+from pyrogram import Client, filters
+from pyrogram.errors import FloodWait
+from datetime import datetime, timedelta
+from pyrogram.types import ChatPermissions
+from replacement_map import REPLACEMENT_MAP
 from apscheduler.schedulers.background import BackgroundScheduler
-import keep_alive
 
 texnic_file = "texnic.mp4"
 
 spot_bot_id = 5633724545
+spot_schedule_id = 'spot_schedule_id'
 
 app = Client("my_account",
              api_id=os.environ.get("api_id"),
              api_hash=os.environ.get("api_hash"))
 
 
-# Получение карточек каждые 4 часа
+# Получение карточки
 def get_card():
   app.send_message(spot_bot_id, text="🧀 Получить карту")
   pass
 
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(get_card, "interval", hours=4)
+# Планировщик для получения карточки каждые 4 часа
+scheduler = BackgroundScheduler(timezone="UTC")
+scheduler.add_job(get_card, "interval", hours=4, id=spot_schedule_id)
 
 
-# Промокоды для SPOT
-@app.on_message(
-  filters.command("promo", prefixes="/") & (~filters.chat(spot_bot_id)))
+# Обновить планировщик
+@app.on_message(filters.command("update", prefixes=".") & filters.me)
+def scheduler_update(_, msg):
+  try:
+    get_card()
+    scheduler.remove_job('spot_schedule_id')
+    scheduler.add_job(get_card, "interval", hours=4, id=spot_schedule_id)
+  except FloodWait as e:
+    sleep(e.x)
+
+
+# Перехват и отправка промокодов в SPOT
+@app.on_message(filters.command("promo", prefixes="/") & (~filters.chat(spot_bot_id)))
 def promo(_, msg):
   try:
     app.send_message(chat_id=spot_bot_id, text=msg.text)
