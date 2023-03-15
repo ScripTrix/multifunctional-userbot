@@ -1,0 +1,4 @@
+pip install pyrogram
+pip install tgcrypto
+pip install flask
+pip install apscheduler
