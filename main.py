@@ -28,9 +28,19 @@ def get_card():
   pass
 
 
-# Планировщик для получения карточки каждые 4 часа
-scheduler = BackgroundScheduler(timezone="UTC")
-scheduler.add_job(get_card, "interval", hours=4, id=spot_schedule_id)
+# Планировщик
+scheduler = BackgroundScheduler(timezone="UTC", )
+
+
+# Инициализация планировщика
+def init_schedule():
+
+  if(scheduler.get_job(spot_schedule_id)):
+    scheduler.remove_job(spot_schedule_id)
+    print(f"[{datetime.now()}] ---> [Schedule removed]")
+  scheduler.add_job(get_card, trigger="interval", 
+                    hours=4, id=spot_schedule_id)
+  print(f"[{datetime.now()}] ---> [Schedule initialized]")
 
 
 # Обновить планировщик
@@ -38,14 +48,14 @@ scheduler.add_job(get_card, "interval", hours=4, id=spot_schedule_id)
 def scheduler_update(_, msg):
   try:
     get_card()
-    scheduler.remove_job('spot_schedule_id')
-    scheduler.add_job(get_card, "interval", hours=4, id=spot_schedule_id)
+    init_schedule()
   except FloodWait as e:
     sleep(e.x)
 
 
 # Перехват и отправка промокодов в SPOT
-@app.on_message(filters.command("promo", prefixes="/") & (~filters.chat(spot_bot_id)))
+@app.on_message(
+  filters.command("promo", prefixes="/") & (~filters.chat(spot_bot_id)))
 def promo(_, msg):
   try:
     app.send_message(chat_id=spot_bot_id, text=msg.text)
@@ -152,6 +162,15 @@ def info(_, msg):
   print(msg)
 
 
-scheduler.start()
-keep_alive.keep_alive()
-app.run()
+# Инициализация приложения
+def initialize():
+  print(f"[{datetime.now()}] ---> [Initialization]")
+  init_schedule()
+  print(f"[{datetime.now()}] ---> [Startup]")
+  scheduler.start()
+  keep_alive.keep_alive()
+  print(f"[{datetime.now()}] ---> [Application started successfully]")
+  app.run()
+
+
+initialize()
