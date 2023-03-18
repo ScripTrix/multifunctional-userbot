@@ -1,15 +1,20 @@
 from flask import Flask
 from threading import Thread
+from datetime import datetime
 
-app = Flask('app')
+flask = Flask('app')
 
-@app.route('/')
+
+@flask.route('/')
 def main():
   return "Bot successfully started!"
 
+
 def run():
-  app.run(host="0.0.0.0", port=8080)
+  flask.run(host="0.0.0.0", port=8080)
+
 
 def keep_alive():
   server = Thread(target=run)
   server.start()
+  print(f"[{datetime.now()}] ---> [Flask server initialized]")
