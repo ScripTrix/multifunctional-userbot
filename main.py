@@ -9,7 +9,6 @@ from pyrogram import Client, filters
 from pyrogram.errors import FloodWait
 from datetime import datetime, timedelta
 from pyrogram.types import ChatPermissions
-from replacement_map import REPLACEMENT_MAP
 from apscheduler.schedulers.background import BackgroundScheduler
 
 texnic_file = "texnic.mp4"
@@ -106,23 +105,6 @@ def hack(_, msg):
     msg.edit("Всё прошло успешно! 🥷")
   else:
     msg.edit("Накрыли лавочку! 🥴")
-
-
-# Перевернутое сообщение (только латиница)
-@app.on_message(filters.command("flip", prefixes=".") & filters.me)
-def flip(_, msg):
-  text = msg.text.split(".flip ", maxsplit=1)[1]
-  final_str = ""
-  for char in text:
-    if char in REPLACEMENT_MAP.keys():
-      new_char = REPLACEMENT_MAP[char]
-    else:
-      new_char = char
-    final_str += new_char
-  if text != final_str:
-    msg.edit(final_str)
-  else:
-    msg.edit(text)
 
 
 # Паша Техник заливает перцем
