@@ -24,7 +24,7 @@ app = Client("my_account",
 # Получение карточки
 def get_card():
   app.send_message(spot_bot_id, text="🧀 Получить карту")
-  pass
+  print(f"[{datetime.now()}] ---> [Сard request]")
 
 
 # Планировщик
