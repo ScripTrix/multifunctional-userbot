@@ -38,7 +38,7 @@ def init_schedule():
     scheduler.remove_job(spot_schedule_id)
     print(f"[{datetime.now()}] ---> [Schedule removed]")
   scheduler.add_job(get_card, trigger="interval", 
-                    hours=4, id=spot_schedule_id)
+                    hours=4, seconds=5, id=spot_schedule_id)
   print(f"[{datetime.now()}] ---> [Schedule initialized]")
 
 
